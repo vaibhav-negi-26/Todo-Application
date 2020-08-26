@@ -1,26 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react"
+import TodoForm from "./components/TodoForm"
+import Todo from "./components/Todo"
+import { Container, Col, Row } from "reactstrap"
+import "bootstrap/dist/css/bootstrap.min.css"
+import "./App.css"
 
-function App() {
+const App = () => {
+  const [todos, setTodos] = useState([])
+
+  // this one works before any component loads up
+  useEffect(() => {
+    const localTodo = localStorage.getItem("todos")
+    if (localTodo) {
+      setTodos(JSON.parse(localTodo))
+    }
+  }, [])
+
+  const AddTodos = (Todo) => {
+    setTodos([...todos, Todo])
+  }
+
+  // this one keeps a watch on todo for any change
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos))
+  }, [todos])
+
+  const markComplete = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id))
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Container fluid>
+      <h1>
+        TODO Application with{" "}
+        <span
+          style={{
+            color: "#61DBFB",
+            fontWeight: "bold",
+          }}>
+          React Hooks
+        </span>{" "}
+        and localStorage
+      </h1>
+      <Row>
+        <Col sm="6" className=" mt-5">
+          <Todo todos={todos} markComplete={markComplete} />
+        </Col>
+        <Col sm="6" className=" mt-5">
+          <TodoForm AddTodos={AddTodos} />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
 
-export default App;
+export default App
